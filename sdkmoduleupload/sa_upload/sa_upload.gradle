@@ -45,7 +45,7 @@ afterEvaluate {
     publishing {
 
         def theVersion = System.properties.getProperty("theVersion", "")
-        def theGroupId = System.properties.getProperty("theGroupId", "")
+        def theGroupId = System.properties.getProperty("theGroupId", "tv.superawesome.sdkmodule")
         def theName = System.properties.getProperty("theName", "")
         def theSiteURL = System.properties.getProperty("theSiteURL", "")
         def theGitURL = System.properties.getProperty("theGitURL", "")
