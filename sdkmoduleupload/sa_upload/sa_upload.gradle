@@ -13,6 +13,24 @@ private String[] getLicenses(String licensesString) {
     }
 }
 
+def getManifestFile() {
+    return file(android.sourceSets.main.manifest.srcFile)
+}
+
+def getManifestProps() {
+    def manifestPropsFile = getManifestFile()
+    def manifestProps = new Properties()
+    manifestProps.load(new FileInputStream(manifestPropsFile))
+    return manifestProps
+}
+
+private String manifestPackageName() {
+    def manifestPackage = (getManifestProps()['package'])
+    def manifestPackageParsed = manifestPackage.substring(0, manifestPackage.lastIndexOf("\""))
+    return manifestPackageParsed.replace("\"","").trim()
+}
+
+
 bintray {
 
     def theLicenses = getLicenses(System.properties.getProperty("theBintrayKeyPkgLicenses", ""))
@@ -44,8 +62,10 @@ afterEvaluate {
 
     publishing {
 
-        def theVersion = System.properties.getProperty("theVersion", "")
-        def theGroupId = System.properties.getProperty("theGroupId", "tv.superawesome.sdkmodule")
+        def pkgName = manifestPackageName()
+
+        def theVersion = System.properties.getProperty("theVersion", "1.0.2")
+        def theGroupId = System.properties.getProperty("theGroupId", pkgName)
         def theName = System.properties.getProperty("theName", "")
         def theSiteURL = System.properties.getProperty("theSiteURL", "")
         def theGitURL = System.properties.getProperty("theGitURL", "")
