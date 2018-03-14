@@ -64,8 +64,8 @@ afterEvaluate {
 
         def pkgName = manifestPackageName()
 
-        def theVersion = System.properties.getProperty("theVersion", "1.0.2")
-        def theGroupId = System.properties.getProperty("theGroupId", pkgName)
+        def theVersion = System.properties.getProperty("theVersion", "")
+        def theGroupId = System.properties.getProperty("theGroupId", "")
         def theName = System.properties.getProperty("theName", "")
         def theSiteURL = System.properties.getProperty("theSiteURL", "")
         def theGitURL = System.properties.getProperty("theGitURL", "")
