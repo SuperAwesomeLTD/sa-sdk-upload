@@ -1,0 +1,91 @@
+
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'maven-publish'
+apply plugin: 'maven'
+
+
+private String[] getLicenses(String licensesString) {
+
+    if (licensesString != null && !licensesString.isEmpty()) {
+        return licensesString.split(',')
+    } else {
+        return ''
+    }
+}
+
+bintray {
+
+    def theLicenses = getLicenses(System.properties.getProperty("theBintrayKeyPkgLicenses", ""))
+
+    bintray.user = System.properties.getProperty("theBintrayUser", "")
+    bintray.key = System.properties.getProperty("theBintrayKey", "")
+    bintray.configurations = ['archives']
+    bintray.publications = ['MavenPub']
+    bintray.project.version = System.properties.getProperty("theBintrayKeyProjectVersion", "")
+    bintray.pkg {
+        repo = System.properties.getProperty("theBintrayKeyPkgRepo", "")
+        name = System.properties.getProperty("theBintrayKeyPkgName", "")
+        websiteUrl = System.properties.getProperty("theBintrayKeyPkgWebsite", "")
+        vcsUrl = System.properties.getProperty("theBintrayKeyPkgVCSUrl", "")
+        licenses = theLicenses
+        publish = true
+    }
+}
+
+task generateSourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier 'sources'
+    group = 'build'
+}
+
+afterEvaluate {
+
+    apply plugin: 'maven-publish'
+
+    publishing {
+
+        def theVersion = System.properties.getProperty("theVersion", "")
+        def theGroupId = System.properties.getProperty("theGroupId", "")
+        def theName = System.properties.getProperty("theName", "")
+        def theSiteURL = System.properties.getProperty("theSiteURL", "")
+        def theGitURL = System.properties.getProperty("theGitURL", "")
+        def theLicenseName = System.properties.getProperty("theLicenseName", "")
+        def theLicenseURL = System.properties.getProperty("theLicenseURL", "")
+        def theDeveloperID = System.properties.getProperty("theDeveloperID", "")
+        def theDeveloperName = System.properties.getProperty("theDeveloperName", "")
+        def theDeveloperEmail = System.properties.getProperty("theDeveloperEmail", "")
+
+        publications {
+            MavenPub(MavenPublication) {
+
+                version theVersion
+                groupId theGroupId
+
+                artifact bundleRelease
+                artifact generateSourcesJar
+
+                pom.withXml {
+                    def root = asNode()
+                    root.appendNode('name', theName)
+                    root.appendNode('url', theSiteURL)
+
+                    def scm = root.appendNode('scm')
+                    scm.appendNode('connection', theGitURL)
+                    scm.appendNode('developerConnection', theGitURL)
+                    scm.appendNode('url', theSiteURL)
+
+                    def license = root.appendNode('licenses').appendNode('license')
+                    license.appendNode('name', theLicenseName)
+                    license.appendNode('url', theLicenseURL)
+
+                    def developers = root.appendNode('developers')
+                    def dev = developers.appendNode('developer')
+                    dev.appendNode('id', theDeveloperID)
+                    dev.appendNode('name', theDeveloperName)
+                    dev.appendNode('email', theDeveloperEmail)
+                }
+
+            }
+        }
+    }
+}
